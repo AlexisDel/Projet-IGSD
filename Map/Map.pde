@@ -3,6 +3,7 @@ Camera camera;
 Hud hud;
 Map3D map;
 Land land;
+Gpx gpx;
 
 void setup() {
 
@@ -26,6 +27,8 @@ void setup() {
   this.map = new Map3D("paris_saclay.data");
 
   this.land = new Land(this.map, "paris_saclay.jpg");
+
+  this.gpx = new Gpx(this.map, "trail.geojson");
 }
 
 void draw() {
@@ -37,6 +40,7 @@ void draw() {
 
   this.workspace.update();
   this.land.update();
+  this.gpx.update(this.camera);
 
   this.hud.update(this.camera);
 }
@@ -78,6 +82,11 @@ void keyPressed() {
       // Enable/Disable sunny vertical lightning
       this.camera.toggle();
       break;
+    case 'x':
+    case 'X':
+      // Enable/Disable GPX track
+      this.gpx.toggle();
+      break;
     }
   }
 }
@@ -98,4 +107,9 @@ void mouseDragged() {
     float dy = mouseY - pmouseY;
     this.camera.adjustColatitude(dy*PI/512.0);
   }
+}
+
+void mousePressed() {
+ if (mouseButton == LEFT)
+ this.gpx.clic(mouseX, mouseY);
 }
