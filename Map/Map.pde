@@ -1,6 +1,8 @@
 WorkSpace workspace;
 Camera camera;
 Hud hud;
+Map3D map;
+Land land;
 
 void setup() {
 
@@ -19,6 +21,11 @@ void setup() {
   // Prepare local coordinate system grid & gizmo
   this.workspace = new WorkSpace(100, 250);
   this.camera = new Camera();
+
+  // Load Height Map
+  this.map = new Map3D("paris_saclay.data");
+
+  this.land = new Land(this.map, "paris_saclay.jpg");
 }
 
 void draw() {
@@ -27,8 +34,10 @@ void draw() {
 
   //Clear
   background(0x40);
-  
+
   this.workspace.update();
+  this.land.update();
+
   this.hud.update(this.camera);
 }
 
@@ -55,12 +64,19 @@ void keyPressed() {
     case 'W':
       // Hide/Show grid & Gizmo
       this.workspace.toggle();
+      // Hide/Show Land
+      this.land.toggle();
       break;
     case '+':
       this.camera.adjustRadius(width*0.25);
       break;
     case '-':
       this.camera.adjustRadius(-width*0.25);
+      break;
+    case 'l':
+    case 'L':
+      // Enable/Disable sunny vertical lightning
+      this.camera.toggle();
       break;
     }
   }

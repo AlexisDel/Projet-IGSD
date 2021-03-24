@@ -1,4 +1,4 @@
-class Hud {
+public class Hud {
   private PMatrix3D hud;
   Hud() {
     // Should be constructed just after P3D size() or fullScreen()

@@ -1,4 +1,4 @@
-class WorkSpace {
+public class WorkSpace {
 
   PShape gizmo;
   PShape grid;
@@ -47,12 +47,12 @@ class WorkSpace {
     this.grid.noFill();
     this.grid.stroke(0x77836C3D);
     this.grid.strokeWeight(0.5f);
-    for (int i=-gridSize; i<gridSize; i++) {
-      for (int j=-gridSize; j<gridSize; j++) {
-        this.grid.vertex(i*250, j*250, 0);
-        this.grid.vertex((i+1)*250, j*250, 0);
-        this.grid.vertex((i+1)*250, (j+1)*250, 0);
-        this.grid.vertex(i*250, (j+1)*250, 0);
+    for (int i=-gridSize*squareSize; i<gridSize*squareSize; i+=squareSize) {
+      for (int j=-gridSize*squareSize; j<gridSize*squareSize; j+=squareSize) {
+        this.grid.vertex(i, j, 0);
+        this.grid.vertex(i+squareSize, j, 0);
+        this.grid.vertex(i+squareSize, j+squareSize, 0);
+        this.grid.vertex(i, j+squareSize, 0);
       }
     }
     this.grid.endShape();

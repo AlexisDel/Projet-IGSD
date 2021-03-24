@@ -1,11 +1,13 @@
-class Camera {
+public class Camera {
 
   CartesianCoordinates cartesianCoordinates;
   SphericalCoordinates sphericalCoordinates;
+  boolean lightning;
 
   Camera() {
     this.cartesianCoordinates = new CartesianCoordinates(0, 2500, 1000);
     this.sphericalCoordinates = cartesianCoordinates.toSphericalCoordinates();
+    this.lightning = false;
   }
 
   public void update() {
@@ -18,6 +20,17 @@ class Camera {
       0, 0, 0, 
       0, 0, -1
       );
+
+    // Sunny vertical lightning
+    ambientLight(0x7F, 0x7F, 0x7F);
+    if (lightning)
+      directionalLight(0xA0, 0xA0, 0x60, 0, 0, -1);
+    lightFalloff(0.0f, 0.0f, 1.0f);
+    lightSpecular(0.0f, 0.0f, 0.0f);
+  }
+
+  public void toggle() {
+    this.lightning = !this.lightning;
   }
 
   public void adjustRadius(float offset) {   
