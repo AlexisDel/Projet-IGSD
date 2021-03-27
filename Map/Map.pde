@@ -4,6 +4,8 @@ Hud hud;
 Map3D map;
 Land land;
 Gpx gpx;
+Railways railways;
+Roads roads;
 
 void setup() {
 
@@ -29,6 +31,10 @@ void setup() {
   this.land = new Land(this.map, "paris_saclay.jpg");
 
   this.gpx = new Gpx(this.map, "trail.geojson");
+
+  this.railways = new Railways(this.map, "railways.geojson");
+  
+  this.roads = new Roads(this.map, "roads.geojson");
 }
 
 void draw() {
@@ -41,7 +47,9 @@ void draw() {
   this.workspace.update();
   this.land.update();
   this.gpx.update(this.camera);
-
+  this.railways.update();
+  this.roads.update();
+  
   this.hud.update(this.camera);
 }
 
@@ -87,6 +95,12 @@ void keyPressed() {
       // Enable/Disable GPX track
       this.gpx.toggle();
       break;
+    case 'r':
+    case 'R':
+      // Enable/Disable railways & roads
+      this.railways.toggle();
+      this.roads.toggle();
+      break;
     }
   }
 }
@@ -94,7 +108,7 @@ void keyPressed() {
 
 void mouseWheel(MouseEvent event) {
   float ec = event.getCount();
-  this.camera.adjustRadius(ec*width*0.25);
+  this.camera.adjustRadius(ec*width*0.1);
 }
 void mouseDragged() {
   if (mouseButton == CENTER) {
@@ -110,6 +124,6 @@ void mouseDragged() {
 }
 
 void mousePressed() {
- if (mouseButton == LEFT)
- this.gpx.clic(mouseX, mouseY);
+  if (mouseButton == LEFT)
+    this.gpx.clic(mouseX, mouseY);
 }
