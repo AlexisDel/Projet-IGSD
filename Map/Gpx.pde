@@ -119,6 +119,7 @@ public class Gpx {
     this.track.setVisible(!this.track.isVisible());
     this.posts.setVisible(!this.posts.isVisible());
     this.thumbtacks.setVisible(!this.thumbtacks.isVisible());
+    resetThumbtack();
   }
 
   public void clic(int x, int y) {
@@ -157,5 +158,12 @@ public class Gpx {
       g.hint(PConstants.ENABLE_DEPTH_TEST);
       popMatrix();
     }
+  }
+  
+  private void resetThumbtack(){
+    this.selectedThumbtack = null;
+    for (int i=0; i <this.thumbtacks.getVertexCount(); i++) {
+      this.thumbtacks.setStroke(i, 0xFFFF3F3F);      
+    }      
   }
 }

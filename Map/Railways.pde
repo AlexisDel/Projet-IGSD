@@ -47,18 +47,18 @@ public class Railways {
             JSONArray point = coordinates.getJSONArray(p);
             Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
             if (gp.inside()) {
-              gp.elevation += 5d;
+              gp.elevation += 7.5d;
               Map3D.ObjectPoint op = map.new ObjectPoint(gp);
               path.add(op.toVector());
             }
           }
-          
+
           float laneWidth = 3.0f;
           PShape section = createShape();
           section.beginShape(QUAD_STRIP);
           section.noStroke();
-          section.fill(0);
-          section.emissive(255);
+          section.fill(255);
+          section.emissive(0xFF);
           for (int i=0; i < path.size(); i++) {
             if (i<path.size()-1) {
               PVector A = path.get(i);
@@ -69,13 +69,15 @@ public class Railways {
               section.normal(0.0f, 0.0f, 1.0f);
               section.vertex(A.x + V.x, A.y + V.y, A.z);
             } else {
-              PVector A = path.get(i);
-              PVector B = path.get(i-1);
-              PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
-              section.normal(0.0f, 0.0f, 1.0f);
-              section.vertex(A.x + V.x, A.y + V.y, A.z);
-              section.normal(0.0f, 0.0f, 1.0f);
-              section.vertex(A.x - V.x, A.y - V.y, A.z); 
+              if (path.size() > 1) {
+                PVector A = path.get(i);
+                PVector B = path.get(i-1);
+                PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
+                section.normal(0.0f, 0.0f, 1.0f);
+                section.vertex(A.x + V.x, A.y + V.y, A.z);
+                section.normal(0.0f, 0.0f, 1.0f);
+                section.vertex(A.x - V.x, A.y - V.y, A.z);
+              }
             }
           }
           section.endShape();         

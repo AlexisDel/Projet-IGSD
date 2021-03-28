@@ -122,8 +122,8 @@ public class Roads {
           PShape section = createShape();
           section.beginShape(QUAD_STRIP);
           section.noStroke();
-          section.fill(0);
-          section.emissive(laneColor);
+          section.fill(laneColor);
+          section.emissive(0x76);
           for (int i=0; i < path.size(); i++) {
             if (i<path.size()-1) {
               PVector A = path.get(i);
