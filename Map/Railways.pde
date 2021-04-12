@@ -27,6 +27,7 @@ public class Railways {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return;
     }
+    
 
     this.railways = createShape(GROUP);
 
@@ -39,7 +40,6 @@ public class Railways {
       switch (geometry.getString("type", "undefined")) {
 
       case "LineString": 
-        // GPX Track
         JSONArray coordinates = geometry.getJSONArray("coordinates");
         if (coordinates != null) {
           ArrayList<PVector> path = new ArrayList();
@@ -59,27 +59,34 @@ public class Railways {
           section.noStroke();
           section.fill(255);
           section.emissive(0xFF);
-          for (int i=0; i < path.size(); i++) {
-            if (i<path.size()-1) {
-              PVector A = path.get(i);
-              PVector B = path.get(i+1);
-              PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
-              section.normal(0.0f, 0.0f, 1.0f);
-              section.vertex(A.x - V.x, A.y - V.y, A.z);
-              section.normal(0.0f, 0.0f, 1.0f);
-              section.vertex(A.x + V.x, A.y + V.y, A.z);
-            } else {
-              if (path.size() > 1) {
-                PVector A = path.get(i);
-                PVector B = path.get(i-1);
-                PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
-                section.normal(0.0f, 0.0f, 1.0f);
-                section.vertex(A.x + V.x, A.y + V.y, A.z);
-                section.normal(0.0f, 0.0f, 1.0f);
-                section.vertex(A.x - V.x, A.y - V.y, A.z);
-              }
-            }
+          
+          PVector A = path.get(0);
+          PVector C = path.get(path.size()-1);
+          PVector vA = new PVector(A.x, A.y, A.z).normalize().mult(laneWidth/2.0f);
+          PVector vC = new PVector(C.x, C.y, C.z).normalize().mult(laneWidth/2.0f);
+          
+          // 1st vertex
+          section.normal(0,0,1);
+          section.vertex(A.x - vA.x, A.y - vA.y, A.z);
+          section.normal(0,0,1);
+          section.vertex(A.x + vA.x, A.y + vA.y, A.z);
+          
+          // Intermediate vertices
+          for (int i=1; i < path.size()-1; i++) {
+            PVector B = path.get(i);
+            PVector vB = new PVector(A.y - C.y, C.x - A.x).normalize().mult(laneWidth/2.0f);
+            section.normal(0.0f, 0.0f, 1.0f);
+            section.vertex(B.x - vB.x, B.y - vB.y, B.z);
+            section.normal(0.0f, 0.0f, 1.0f);
+            section.vertex(B.x + vB.x, B.y + vB.y, B.z);
           }
+          
+          // Last vertex
+          section.normal(0,0,1);
+          section.vertex(C.x - vC.x, C.y - vC.y, C.z);
+          section.normal(0,0,1);
+          section.vertex(C.x + vC.x, C.y + vC.y, C.z);
+
           section.endShape();         
           railways.addChild(section);
         }

@@ -1,0 +1,7 @@
+[out:json][timeout:25][bbox:48.6935887,2.1504057,48.7201061,2.2187721];
+(
+ node["amenity"="bicycle_parking"];
+);
+out body;
+>;
+out skel qt;

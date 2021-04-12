@@ -123,8 +123,11 @@ public class Roads {
           section.beginShape(QUAD_STRIP);
           section.noStroke();
           section.fill(laneColor);
-          section.emissive(0x76);
+          section.emissive(0x7F);
+
           for (int i=0; i < path.size(); i++) {
+
+            // Handles all vectors except the last one (because we need 2 vectors, i and i+1 )
             if (i<path.size()-1) {
               PVector A = path.get(i);
               PVector B = path.get(i+1);
@@ -133,16 +136,18 @@ public class Roads {
               section.vertex(A.x - V.x, A.y - V.y, A.z);
               section.normal(0.0f, 0.0f, 1.0f);
               section.vertex(A.x + V.x, A.y + V.y, A.z);
-            } else {
-              if (path.size() > 1) {
-                PVector A = path.get(i);
-                PVector B = path.get(i-1);
-                PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
-                section.normal(0.0f, 0.0f, 1.0f);
-                section.vertex(A.x + V.x, A.y + V.y, A.z);
-                section.normal(0.0f, 0.0f, 1.0f);
-                section.vertex(A.x - V.x, A.y - V.y, A.z);
-              }
+
+              // Handles the last vector
+            } else 
+            // If path is not a single point (then we can find a vector preceding the last one)
+            if (path.size() > 1) {
+              PVector A = path.get(i);
+              PVector B = path.get(i-1);
+              PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
+              section.normal(0.0f, 0.0f, 1.0f);
+              section.vertex(A.x + V.x, A.y + V.y, A.z);
+              section.normal(0.0f, 0.0f, 1.0f);
+              section.vertex(A.x - V.x, A.y - V.y, A.z);
             }
           }
           section.endShape();         

@@ -22,9 +22,13 @@ public class Land {
     this.shadow.beginShape(QUADS);
     this.shadow.fill(0x992F2F2F);
     this.shadow.noStroke();
+    // Top left map corner
     this.shadow.vertex(-w/2.0f, -h/2.0f, 0);
+    // Top right map corner
     this.shadow.vertex(w/2.0f, -h/2.0f, 0);
+    // Bottom right map corner
     this.shadow.vertex(w/2.0f, h/2.0f, 0);
+    // Bottom left map corner
     this.shadow.vertex(-w/2.0f, h/2.0f, 0);
     this.shadow.endShape();
 
@@ -36,28 +40,31 @@ public class Land {
     this.wireFrame.strokeWeight(0.5f);
 
     for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
-      for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {   
+      for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
+        
+        //Build box
+        Map3D.ObjectPoint nw = map.new ObjectPoint(i, j); // Top left corner
+        Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSize, j); // Top right corner
+        Map3D.ObjectPoint se = map.new ObjectPoint(i+tileSize, j+tileSize); // Bottom right corner
+        Map3D.ObjectPoint sw = map.new ObjectPoint(i, j+tileSize); // Bottom left corner
 
-        Map3D.ObjectPoint onw = map.new ObjectPoint(i, j);
-        Map3D.ObjectPoint one = map.new ObjectPoint(i+tileSize, j);
-        Map3D.ObjectPoint ose = map.new ObjectPoint(i+tileSize, j+tileSize);
-        Map3D.ObjectPoint osw = map.new ObjectPoint(i, j+tileSize);
-
-        this.wireFrame.vertex(onw.x, onw.y, onw.z);
-        this.wireFrame.vertex(one.x, one.y, one.z);
-        this.wireFrame.vertex(ose.x, ose.y, ose.z);
-        this.wireFrame.vertex(osw.x, osw.y, osw.z);
+        // Add box to wireFrame
+        this.wireFrame.vertex(nw.x, nw.y, nw.z);
+        this.wireFrame.vertex(ne.x, ne.y, ne.z);
+        this.wireFrame.vertex(se.x, se.y, se.z);
+        this.wireFrame.vertex(sw.x, sw.y, sw.z);
       }
     }
     this.wireFrame.endShape();
 
 
-    //Texutre
+    // Texutre
     File ressource = dataFile(textrueFilename);
     if (!ressource.exists() || ressource.isDirectory()) {
       println("ERROR: Land texture file " + textrueFilename + " not found.");
       exitActual();
     }
+    // Load texture
     PImage uvmap = loadImage(textrueFilename);
     
     this.satellite = createShape();
@@ -65,38 +72,59 @@ public class Land {
     this.satellite.noFill();
     this.satellite.noStroke();
     this.satellite.emissive(0xD0);
+    // load texture to sattelite
     this.satellite.texture(uvmap);
     
+    //Poi distance
+    Poi pointsOfInterests = new Poi();
+    ArrayList<Map3D.ObjectPoint> BykeParkingDistances = pointsOfInterests.getPoints("bicycle_parking.geojson");
+    
+    //Build satellite
     for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
-      for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {   
-
-        Map3D.ObjectPoint onw = map.new ObjectPoint(i, j);
-        float ionwx = ( (onw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
-        float ionwy = ( (onw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
-        PVector nonw = onw.toNormal();
-        this.satellite.normal(nonw.x, nonw.y, nonw.z);
-        this.satellite.vertex(onw.x, onw.y, onw.z, ionwx, ionwy);
+      for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
         
-        Map3D.ObjectPoint one = map.new ObjectPoint(i+tileSize, j);
-        float ionex = ( (one.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
-        float ioney = ( (one.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
-        PVector none = one.toNormal();
-        this.satellite.normal(none.x, none.y, none.z);
-        this.satellite.vertex(one.x, one.y, one.z, ionex, ioney);
+        // BykeParkings
+        float nearestBykeParkingDistance = dist(i, j, BykeParkingDistances.get(0).x, BykeParkingDistances.get(0).y);
+        for (Map3D.ObjectPoint p : BykeParkingDistances){
+          if (dist(i, j, p.x, p.y) < nearestBykeParkingDistance){
+            nearestBykeParkingDistance = dist(i, j, p.x, p.y);            
+          }
+        }
         
-        Map3D.ObjectPoint ose = map.new ObjectPoint(i+tileSize, j+tileSize);
-        float iosex = ( (ose.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
-        float iosey = ( (ose.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
-        PVector nose = ose.toNormal();
-        this.satellite.normal(nose.x, nose.y, nose.z);
-        this.satellite.vertex(ose.x, ose.y, ose.z, iosex, iosey);
+        // Build tile
         
-        Map3D.ObjectPoint osw = map.new ObjectPoint(i, j+tileSize);
-        float ioswx = ( (osw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
-        float ioswy = ( (osw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
-        PVector nosw = osw.toNormal();
-        this.satellite.normal(nosw.x, nosw.y, nosw.z);
-        this.satellite.vertex(osw.x, osw.y, osw.z, ioswx, ioswy);
+        // North West corner
+        Map3D.ObjectPoint nw = map.new ObjectPoint(i, j);
+        float nwU = ( (nw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
+        float nwV = ( (nw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
+        PVector nnw = nw.toNormal();
+        this.satellite.normal(nnw.x, nnw.y, nnw.z);
+        this.satellite.attrib("heat", nearestBykeParkingDistance);
+        this.satellite.vertex(nw.x, nw.y, nw.z, nwU, nwV);
+        
+        // North Est corner
+        Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSize, j);
+        float neU = ( (ne.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
+        float neV = ( (ne.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
+        PVector nne = ne.toNormal();
+        this.satellite.normal(nne.x, nne.y, nne.z);
+        this.satellite.vertex(ne.x, ne.y, ne.z, neU, neV);
+        
+        // South Est corner
+        Map3D.ObjectPoint se = map.new ObjectPoint(i+tileSize, j+tileSize);
+        float seU = ( (se.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
+        float seV = ( (se.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
+        PVector nse = se.toNormal();
+        this.satellite.normal(nse.x, nse.y, nse.z);
+        this.satellite.vertex(se.x, se.y, se.z, seU, seV);
+        
+        // South West corner
+        Map3D.ObjectPoint sw = map.new ObjectPoint(i, j+tileSize);
+        float swU = ( (sw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
+        float swV = ( (sw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
+        PVector nsw = sw.toNormal();
+        this.satellite.normal(nsw.x, nsw.y, nsw.z);
+        this.satellite.vertex(sw.x, sw.y, sw.z, swU, swV);
         
       }
     }
@@ -109,7 +137,10 @@ public class Land {
     this.wireFrame.setVisible(false);
     this.satellite.setVisible(true);
   }
-
+  
+  /**
+   * Update Land display
+   */
   public void update() {
     shape(this.shadow);
     shape(this.wireFrame);

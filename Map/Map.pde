@@ -7,13 +7,13 @@ Gpx gpx;
 Railways railways;
 Roads roads;
 Buildings buildings;
+PShader myShader;
 
 void setup() {
 
   // Display setup
+  myShader = loadShader("fragmentShader.glsl", "vertexShader.glsl");
   fullScreen(P3D);
-  //size(1000, 1000, P3D);
-  this.hud = new Hud();  // Setup Head Up Display
   smooth(8);
   frameRate(60);
 
@@ -21,16 +21,20 @@ void setup() {
 
   // Initial drawing
   background(0x40);
-
+  
+  // Setup Head Up Display
+  this.hud = new Hud();
+  
   // Prepare local coordinate system grid & gizmo
-  this.workspace = new WorkSpace(100, 250);
+  this.workspace = new WorkSpace();
   this.camera = new Camera();
 
   // Load Height Map
   this.map = new Map3D("paris_saclay.data");
 
+  // Load texture
   this.land = new Land(this.map, "paris_saclay.jpg");
-
+   
   this.gpx = new Gpx(this.map, "trail.geojson");
 
   this.railways = new Railways(this.map, "railways.geojson");
@@ -48,9 +52,11 @@ void setup() {
 }
 
 void draw() {
+  
+  //shader(myShader);
 
   this.camera.update();
-
+  
   //Clear
   background(0x40);
 

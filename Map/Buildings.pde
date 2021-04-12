@@ -7,7 +7,7 @@ public class Buildings {
   }
 
   public void add(String filename, int building_color) {
-
+    
     // Check ressources
     File ressource = dataFile(filename);
     if (!ressource.exists() || ressource.isDirectory()) {
