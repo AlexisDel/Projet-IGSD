@@ -135,7 +135,7 @@ public class Gpx {
   }
   
 /**
-   * Toggle track & information points(thumbtacks and posts).
+   * Toggle track, thumbtacks and posts.
    */
   public void toggle() {
     this.track.setVisible(!this.track.isVisible());
