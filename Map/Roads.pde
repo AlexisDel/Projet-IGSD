@@ -1,7 +1,10 @@
 public class Roads {
 
   PShape roads;
-
+  
+  /**
+   * Returns a Roads object
+   */
   Roads(Map3D map, String filename) {
 
     // Check ressources
@@ -30,21 +33,24 @@ public class Roads {
 
     this.roads = createShape(GROUP);
 
-
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
         break;
       JSONObject geometry = feature.getJSONObject("geometry");
       switch (geometry.getString("type", "undefined")) {
-
-      case "LineString": 
+      
+      // Get roads segement (represented by Linestring in geojson file)
+      case "LineString":
+        // Get segment points coordinates as an array
         JSONArray coordinates = geometry.getJSONArray("coordinates");
 
         String laneKind = "unclassified";
         color laneColor = 0xFFFF0000;
         double laneOffset = 1.50d;
         float laneWidth = 0.5f;
+        
+        // Set lane properties according to road type
         if (feature.hasKey("properties")) {
           laneKind = feature.getJSONObject("properties").getString("highway", "unclassified");
         }
@@ -89,7 +95,7 @@ public class Roads {
         case "corridor":
         case "cycleway":
         case "footway":
-        case "path":
+        case "segment":
         case "pedestrian":
         case "service":
         case "steps":
@@ -108,14 +114,16 @@ public class Roads {
         }
 
         if (coordinates != null) {
-          ArrayList<PVector> path = new ArrayList();
+          ArrayList<PVector> segment = new ArrayList();
+          
+          // Convert each point of this segment to vector and add it to "segment" variable
           for (int p=0; p < coordinates.size(); p++) {
             JSONArray point = coordinates.getJSONArray(p);
             Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
             if (gp.inside() && gp.elevation > 0) {
               gp.elevation += 5d;
               Map3D.ObjectPoint op = map.new ObjectPoint(gp);
-              path.add(op.toVector());
+              segment.add(op.toVector());
             }
           }
 
@@ -125,12 +133,12 @@ public class Roads {
           section.fill(laneColor);
           section.emissive(0x7F);
 
-          for (int i=0; i < path.size(); i++) {
+          for (int i=0; i < segment.size(); i++) {
 
             // Handles all vectors except the last one (because we need 2 vectors, i and i+1 )
-            if (i<path.size()-1) {
-              PVector A = path.get(i);
-              PVector B = path.get(i+1);
+            if (i<segment.size()-1) {
+              PVector A = segment.get(i);
+              PVector B = segment.get(i+1);
               PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
               section.normal(0.0f, 0.0f, 1.0f);
               section.vertex(A.x - V.x, A.y - V.y, A.z);
@@ -139,10 +147,10 @@ public class Roads {
 
               // Handles the last vector
             } else 
-            // If path is not a single point (then we can find a vector preceding the last one)
-            if (path.size() > 1) {
-              PVector A = path.get(i);
-              PVector B = path.get(i-1);
+            // If segment is not a single point (then we can find a vector preceding the last one)
+            if (segment.size() > 1) {
+              PVector A = segment.get(i);
+              PVector B = segment.get(i-1);
               PVector V = new PVector(A.y - B.y, B.x - A.x).normalize().mult(laneWidth/2.0f);
               section.normal(0.0f, 0.0f, 1.0f);
               section.vertex(A.x + V.x, A.y + V.y, A.z);
@@ -164,11 +172,17 @@ public class Roads {
     // Shapes initial visibility
     this.roads.setVisible(true);
   }
-
+  
+  /**
+   * Update roads display
+   */
   public void update() {
     shape(this.roads);
   }
-
+  
+  /**
+   * Toggle roads visibility.
+   */
   public void toggle() {
     this.roads.setVisible(!this.roads.isVisible());
   }

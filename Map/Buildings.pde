@@ -1,7 +1,10 @@
 public class Buildings {
 
   PShape buildings;
-
+  
+  /**
+   * Returns a Buildings object
+   */
   Buildings(Map3D map) {
     this.buildings = createShape(GROUP);
   }
@@ -111,11 +114,17 @@ public class Buildings {
       }
     }
   }
-
+  
+  /**
+   * Update buildings display
+   */
   public void update() {
     shape(this.buildings);
   }
-
+  
+  /**
+   * Toggle buildings visibility.
+   */
   public void toggle() {
     this.buildings.setVisible(!this.buildings.isVisible());
   }

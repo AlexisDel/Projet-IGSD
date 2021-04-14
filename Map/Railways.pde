@@ -2,6 +2,9 @@ public class Railways {
 
   PShape railways;
 
+  /**
+   * Returns a Railways object
+   */
   Railways(Map3D map, String filename) {
 
     // Check ressources
@@ -27,7 +30,7 @@ public class Railways {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return;
     }
-    
+
 
     this.railways = createShape(GROUP);
 
@@ -39,17 +42,21 @@ public class Railways {
       JSONObject geometry = feature.getJSONObject("geometry");
       switch (geometry.getString("type", "undefined")) {
 
-      case "LineString": 
+      // Get railways segement points (represented by Linestring in geojson file)
+      case "LineString":
+        // Get segment points coordinates as an array
         JSONArray coordinates = geometry.getJSONArray("coordinates");
         if (coordinates != null) {
-          ArrayList<PVector> path = new ArrayList();
+          ArrayList<PVector> segement = new ArrayList();
+
+          // Convert each point of this segment to vector and add it to "segment" variable
           for (int p=0; p < coordinates.size(); p++) {
             JSONArray point = coordinates.getJSONArray(p);
             Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
             if (gp.inside()) {
               gp.elevation += 7.5d;
               Map3D.ObjectPoint op = map.new ObjectPoint(gp);
-              path.add(op.toVector());
+              segement.add(op.toVector());
             }
           }
 
@@ -59,32 +66,42 @@ public class Railways {
           section.noStroke();
           section.fill(255);
           section.emissive(0xFF);
-          
-          PVector A = path.get(0);
-          PVector C = path.get(path.size()-1);
-          PVector vA = new PVector(A.x, A.y, A.z).normalize().mult(laneWidth/2.0f);
-          PVector vC = new PVector(C.x, C.y, C.z).normalize().mult(laneWidth/2.0f);
-          
+
+          // First point
+          PVector A = segement.get(0);
+          // Second point
+          PVector B1 = segement.get(1);
+          // Second to last point
+          PVector B2 = segement.get(segement.size()-2);
+          // Last point
+          PVector C = segement.get(segement.size()-1);
+
+          // AB1 normal
+          PVector vA = new PVector(A.y - B1.y, B1.x - A.x).normalize().mult(laneWidth/2.0f);
+          // B2A normal
+          PVector vC = new PVector(B2.y - C.y, C.x - B2.x).normalize().mult(laneWidth/2.0f);
+          // AC normal
+          PVector vB = new PVector(A.y - C.y, C.x - A.x).normalize().mult(laneWidth/2.0f);
+
           // 1st vertex
-          section.normal(0,0,1);
+          section.normal(0, 0, 1);
           section.vertex(A.x - vA.x, A.y - vA.y, A.z);
-          section.normal(0,0,1);
+          section.normal(0, 0, 1);
           section.vertex(A.x + vA.x, A.y + vA.y, A.z);
-          
+
           // Intermediate vertices
-          for (int i=1; i < path.size()-1; i++) {
-            PVector B = path.get(i);
-            PVector vB = new PVector(A.y - C.y, C.x - A.x).normalize().mult(laneWidth/2.0f);
+          for (int i=1; i < segement.size()-1; i++) {
+            PVector B = segement.get(i);
             section.normal(0.0f, 0.0f, 1.0f);
             section.vertex(B.x - vB.x, B.y - vB.y, B.z);
             section.normal(0.0f, 0.0f, 1.0f);
             section.vertex(B.x + vB.x, B.y + vB.y, B.z);
           }
-          
+
           // Last vertex
-          section.normal(0,0,1);
+          section.normal(0, 0, 1);
           section.vertex(C.x - vC.x, C.y - vC.y, C.z);
-          section.normal(0,0,1);
+          section.normal(0, 0, 1);
           section.vertex(C.x + vC.x, C.y + vC.y, C.z);
 
           section.endShape();         
@@ -102,10 +119,16 @@ public class Railways {
     this.railways.setVisible(true);
   }
 
+  /**
+   * Update railways display
+   */
   public void update() {
     shape(this.railways);
   }
 
+  /**
+   * Toggle railways visibility.
+   */
   public void toggle() {
     this.railways.setVisible(!this.railways.isVisible());
   }
