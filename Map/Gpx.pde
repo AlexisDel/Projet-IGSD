@@ -6,9 +6,17 @@ public class Gpx {
   StringList descriptions;
   Integer selectedThumbtack;
 
+/**
+   * Returns a Gpx object.
+   * Prepares trail with interactive thumbtacks
+   * @param map associated elevation Map3D object
+   * @param gpxFileName trail's path coordinates associated geojson file  
+   * @return Gpx object
+   */
 
   Gpx(Map3D map, String gpxFilename) {
-
+    
+    //Setting the selected thumbtack to no thumbtack
     this.selectedThumbtack = null;
 
     // Check ressources
@@ -34,25 +42,29 @@ public class Gpx {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return;
     }
-
+    //Begins drawing the track
     this.track = createShape();
     this.track.beginShape();
     this.track.noFill();
     this.track.stroke(127, 80, 127);
     this.track.strokeWeight(5);
-
+    
+    //Begins drawing each thumbtack's post
     this.posts = createShape();
     this.posts.beginShape(LINES);
     this.posts.stroke(255);
     this.posts.strokeWeight(1);
-
+    
+    //Begins drawing the thumbtacks
     this.thumbtacks = createShape();
     this.thumbtacks.beginShape(POINTS);
     this.thumbtacks.stroke(240, 90, 90);
     this.thumbtacks.strokeWeight(10);
-
+    
+    //Initializes a StringList to store each Thumbtack description
     this.descriptions = new StringList();
-
+    
+    //Treats each feature contained in the JSON
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
@@ -64,6 +76,7 @@ public class Gpx {
         // GPX Track
         JSONArray coordinates = geometry.getJSONArray("coordinates");
         if (coordinates != null)
+          //Adds a line the trail
           for (int p=0; p < coordinates.size(); p++) {
             JSONArray point = coordinates.getJSONArray(p);
             Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
@@ -82,8 +95,10 @@ public class Gpx {
             description = feature.getJSONObject("properties").getString("desc", 
               description);
           }
+          //adds the description of each waypoint to the StringList
           this.descriptions.append(description);
-
+          
+          //Adds a thumbtack and it's post.
           Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
           Map3D.ObjectPoint op = map.new ObjectPoint(gp);
           this.posts.vertex(op.x, op.y, op.z);
@@ -108,13 +123,20 @@ public class Gpx {
     this.thumbtacks.setVisible(true);
   }
 
+/**
+   * Update Gpx display
+   * @param camera used to update the current camera position
+   */
   public void update(Camera camera) {
     shape(this.track);
     shape(this.posts);
     shape(this.thumbtacks);
     displayDescription(this.selectedThumbtack, camera);
   }
-
+  
+/**
+   * Toggle track, thumbtacks and posts.
+   */
   public void toggle() {
     this.track.setVisible(!this.track.isVisible());
     this.posts.setVisible(!this.posts.isVisible());
@@ -122,7 +144,15 @@ public class Gpx {
     resetThumbtack();
   }
 
+/**
+   * Verifies if any thumbtack has been clicked on,
+   * if so changes its color and assigns it to the
+   * selectedThumbtack attribut.
+   * @params x,y expected to be mouseX, mouseY 
+   * when function is called.
+   */
   public void clic(int x, int y) {
+  
     this.selectedThumbtack = null;
     for (int i=0; i <this.thumbtacks.getVertexCount(); i++) {     
       PVector v = this.thumbtacks.getVertex(i);
@@ -138,12 +168,17 @@ public class Gpx {
       }
     }
   }
-
+  
+  /**
+   * displays the description of the selected thumbtack
+   * @param index of the selected thumbtack
+   * @param camera
+   */
   private void displayDescription(Integer index, Camera camera) {
     if (index != null) {
-
+      //Vector of the selected thumbtack
       PVector hit = this.thumbtacks.getVertex(index);
-
+      //Displays the description 
       pushMatrix();
       lights();
       fill(0xFFFFFFFF);
@@ -159,7 +194,9 @@ public class Gpx {
       popMatrix();
     }
   }
-  
+  /**
+  * Resets all the thumbtacks to their unselected state.
+  */
   private void resetThumbtack(){
     this.selectedThumbtack = null;
     for (int i=0; i <this.thumbtacks.getVertexCount(); i++) {
