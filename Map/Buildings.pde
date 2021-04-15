@@ -6,6 +6,7 @@ public class Buildings {
    * Returns a Buildings object
    */
   Buildings(Map3D map) {
+    //Initilize the building group Shape that will group all the buildings in the file 
     this.buildings = createShape(GROUP);
   }
   
@@ -39,14 +40,16 @@ public class Buildings {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return;
     }
-    //Adds each building to the group Buildings
+    
+    //Evaluates each feature in the file and adds it to buildings if it's geometry correponds to a polygon
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
         break;
       JSONObject geometry = feature.getJSONObject("geometry");
       switch (geometry.getString("type", "undefined")) {
-
+      
+      //Adds each polygon (building) to the group Buildings
       case "Polygon": 
         // Gets building coordinates and levels to set the height of the structure
         JSONArray coordinates = geometry.getJSONArray("coordinates");
