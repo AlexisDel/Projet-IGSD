@@ -32,7 +32,8 @@ public class Roads {
     }
 
     this.roads = createShape(GROUP);
-
+    
+    //Evaluates each feature in the file and adds it to roads if it's geometry correponds to a LineString
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
