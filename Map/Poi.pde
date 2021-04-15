@@ -1,7 +1,13 @@
 public class Poi {
   
+  /**
+   * Returns an ArrayList with all points of interest
+   * @param filename trail's path coordinates associated geojson file  
+   * @return ArrayList of Map3D.ObjectPoint  
+   */
   public ArrayList<Map3D.ObjectPoint> getPoints(String filename){
-    
+  
+    //Initialize the ArrayList 
     ArrayList<Map3D.ObjectPoint> pointsList = new ArrayList();
     
     // Check ressources
@@ -28,13 +34,15 @@ public class Poi {
       return null;
     }
     
+    //Evaluates each feature in the file and adds it to pointsList if it's geometry correponds to a point
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
         break;
       JSONObject geometry = feature.getJSONObject("geometry");
       switch (geometry.getString("type", "undefined")) {
-
+      
+       //Adds each point of interest to the ArrayList pointsList
        case "Point":        
         if (geometry.hasKey("coordinates")) {
           JSONArray point = geometry.getJSONArray("coordinates");
