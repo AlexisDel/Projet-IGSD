@@ -8,7 +8,12 @@ public class Buildings {
   Buildings(Map3D map) {
     this.buildings = createShape(GROUP);
   }
-
+  
+  /**
+   * Adds a group of buildings to the Map 
+   * @param filename of the GeoJSON with the building's data
+   * @param building_color code in hexadecimal
+   */
   public void add(String filename, int building_color) {
     
     // Check ressources
@@ -34,7 +39,7 @@ public class Buildings {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return;
     }
-
+    //Adds each building to the group Buildings
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
@@ -43,11 +48,12 @@ public class Buildings {
       switch (geometry.getString("type", "undefined")) {
 
       case "Polygon": 
-        // GPX Track
+        // Gets building coordinates and levels to set the height of the structure
         JSONArray coordinates = geometry.getJSONArray("coordinates");
         float top = 0;
         if (feature.hasKey("properties")) {
             int levels = feature.getJSONObject("properties").getInt("building:levels", 1);
+            //height of the structure
             top = Map3D.heightScale * 3.0f * (float)levels;
           }        
         if (coordinates != null) {
@@ -64,7 +70,7 @@ public class Buildings {
               }
             }
           }
-
+          //Adds the floor of the building to the group Buildings
           PShape floor = createShape();
           floor.beginShape();
           floor.noStroke();
@@ -76,7 +82,7 @@ public class Buildings {
           floor.endShape();         
           buildings.addChild(floor);
           
-          
+          //Adds the roof of the building to the group Buildings
           PShape roof = createShape();
           roof.beginShape();
           roof.noStroke();
@@ -90,7 +96,7 @@ public class Buildings {
           roof.endShape();         
           buildings.addChild(roof);
           
-          
+          //Adds the walls of the building to the group Buildings
           PShape walls = createShape();
           walls.beginShape(QUAD);
           walls.noStroke();
