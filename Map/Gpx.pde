@@ -64,7 +64,7 @@ public class Gpx {
     //Initializes a StringList to store each Thumbtack description
     this.descriptions = new StringList();
     
-    //Treats each feature contained in the JSON
+    //Evaluates each feature's geometry in the JSON
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
