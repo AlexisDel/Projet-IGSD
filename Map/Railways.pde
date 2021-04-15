@@ -34,7 +34,7 @@ public class Railways {
 
     this.railways = createShape(GROUP);
 
-
+    //Evaluates each feature in the file and adds it to railways if it's geometry correponds to a LineString
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
       if (!feature.hasKey("geometry"))
