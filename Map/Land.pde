@@ -13,6 +13,7 @@ public class Land {
   Land(Map3D map, String textrueFilename) {
 
     final float tileSize = 25.0f;
+    final float tileSizeSatellite = 10.0f;
 
     float w = (float)Map3D.width;
     float h = (float)Map3D.height;
@@ -83,12 +84,12 @@ public class Land {
     ArrayList<Map3D.ObjectPoint> BykeParkingDistances = pointsOfInterests.getPoints("bicycle_parking.geojson");
     ArrayList<Map3D.ObjectPoint> Bench_Picnic_TableDistances = pointsOfInterests.getPoints("bench&picnic_table.geojson");
     
-    JSONArray poiDistances = pointsOfInterests.getPoiDistances(w, h, tileSize, BykeParkingDistances, Bench_Picnic_TableDistances);
+    JSONArray poiDistances = pointsOfInterests.getPoiDistances(w, h, tileSizeSatellite, BykeParkingDistances, Bench_Picnic_TableDistances);
 
     //Build satellite
     int index = 0;
-    for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
-      for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
+    for (float i=-w/2.0f; i<w/2.0f; i+=tileSizeSatellite) {
+      for (float j=-h/2.0f; j<h/2.0f; j+=tileSizeSatellite) {
 
         // Build tile
 
@@ -102,7 +103,7 @@ public class Land {
         this.satellite.vertex(nw.x, nw.y, nw.z, nwU, nwV);
 
         // North Est corner
-        Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSize, j);
+        Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSizeSatellite, j);
         float neU = ( (ne.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
         float neV = ( (ne.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nne = ne.toNormal();
@@ -110,7 +111,7 @@ public class Land {
         this.satellite.vertex(ne.x, ne.y, ne.z, neU, neV);
 
         // South Est corner
-        Map3D.ObjectPoint se = map.new ObjectPoint(i+tileSize, j+tileSize);
+        Map3D.ObjectPoint se = map.new ObjectPoint(i+tileSizeSatellite, j+tileSizeSatellite);
         float seU = ( (se.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
         float seV = ( (se.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nse = se.toNormal();
@@ -118,7 +119,7 @@ public class Land {
         this.satellite.vertex(se.x, se.y, se.z, seU, seV);
 
         // South West corner
-        Map3D.ObjectPoint sw = map.new ObjectPoint(i, j+tileSize);
+        Map3D.ObjectPoint sw = map.new ObjectPoint(i, j+tileSizeSatellite);
         float swU = ( (sw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
         float swV = ( (sw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nsw = sw.toNormal();
