@@ -26,11 +26,14 @@ void setup() {
 
   // Load texture
   this.land = new Land(this.map, "paris_saclay.jpg");
-   
+  
+  // Load the trail data
   this.gpx = new Gpx(this.map, "trail.geojson");
-
+  
+  // Load the railways data
   this.railways = new Railways(this.map, "railways.geojson");
-
+  
+  // Load the roads data
   this.roads = new Roads(this.map, "roads.geojson");
 
   // Prepare buildings
@@ -57,14 +60,16 @@ void setup() {
 }
 
 void draw() {
-
+  //Update camera position
   this.camera.update();
   
+  //Shader
   shader(myShader);
   
-  //Clear
+  //Clear the background
   background(0x40);
-
+  
+  //Draw PShapes
   this.workspace.update();
   this.land.update();
   this.railways.update();
@@ -76,7 +81,6 @@ void draw() {
 }
 
 void keyPressed() {
-
   if (key == CODED) {
     switch (keyCode) {
     case UP:
