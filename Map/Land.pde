@@ -62,7 +62,7 @@ public class Land {
     this.wireFrame.endShape();
 
 
-    // Texutre
+    // Texture
     File ressource = dataFile(textrueFilename);
     if (!ressource.exists() || ressource.isDirectory()) {
       println("ERROR: Land texture file " + textrueFilename + " not found.");
@@ -83,7 +83,7 @@ public class Land {
     Poi pointsOfInterests = new Poi();
     ArrayList<Map3D.ObjectPoint> BykeParkingDistances = pointsOfInterests.getPoints("bicycle_parking.geojson");
     ArrayList<Map3D.ObjectPoint> Bench_Picnic_TableDistances = pointsOfInterests.getPoints("bench&picnic_table.geojson");
-    
+    //Loads the JSONArray containing the nearest distance to both Poi for each point in the Map
     JSONArray poiDistances = pointsOfInterests.getPoiDistances(w, h, tileSizeSatellite, BykeParkingDistances, Bench_Picnic_TableDistances);
 
     //Build satellite
@@ -99,6 +99,7 @@ public class Land {
         float nwV = ( (nw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nnw = nw.toNormal();
         this.satellite.normal(nnw.x, nnw.y, nnw.z);
+        //Gives this point in the map the attribute heat which gives it both distances to the nearest Pois.
         this.satellite.attrib("heat", poiDistances.getJSONObject(index).getInt("nearestBykeParkingDistance"), poiDistances.getJSONObject(index).getInt("nearestBench&Picnic_TableDistance"));
         this.satellite.vertex(nw.x, nw.y, nw.z, nwU, nwV);
 
