@@ -1,15 +1,15 @@
 public class Poi {
-  
+
   /**
    * Returns an ArrayList with all points of interest
    * @param filename trail's path coordinates associated geojson file  
    * @return ArrayList of Map3D.ObjectPoint  
    */
-  public ArrayList<Map3D.ObjectPoint> getPoints(String filename){
-  
+  public ArrayList<Map3D.ObjectPoint> getPoints(String filename) {
+
     //Initialize the ArrayList 
     ArrayList<Map3D.ObjectPoint> pointsList = new ArrayList();
-    
+
     // Check ressources
     File ressource = dataFile(filename);
     if (!ressource.exists() || ressource.isDirectory()) {
@@ -33,7 +33,7 @@ public class Poi {
       println("WARNING: GeoJSON file doesn't contain any feature.");
       return null;
     }
-    
+
     //Evaluates each feature in the file and adds it to pointsList if it's geometry correponds to a point
     for (int f=0; f<features.size(); f++) {
       JSONObject feature = features.getJSONObject(f);
@@ -41,9 +41,9 @@ public class Poi {
         break;
       JSONObject geometry = feature.getJSONObject("geometry");
       switch (geometry.getString("type", "undefined")) {
-      
-       //Adds each point of interest to the ArrayList pointsList
-       case "Point":        
+
+        //Adds each point of interest to the ArrayList pointsList
+      case "Point":        
         if (geometry.hasKey("coordinates")) {
           JSONArray point = geometry.getJSONArray("coordinates");
           Map3D.GeoPoint gp = map.new GeoPoint(point.getDouble(0), point.getDouble(1));
@@ -57,9 +57,9 @@ public class Poi {
         break;
       }
     }
-    return pointsList;  
+    return pointsList;
   }
-  
+
   public int nearestDistance(float x, float y, ArrayList<Map3D.ObjectPoint> points) {
     int nearestDistance = (int) dist(x, y, points.get(0).x, points.get(0).y);
     for (Map3D.ObjectPoint p : points) {
@@ -69,6 +69,33 @@ public class Poi {
     }
     return nearestDistance;
   }
-  
-  
+
+  public JSONArray getPoiDistances(float w, float h, float tileSize, ArrayList<Map3D.ObjectPoint> BykeParkings, ArrayList<Map3D.ObjectPoint> Bench_Picnic_Tables) {
+    File ressource = dataFile("poi_distances.json");
+    
+    // If "poi_distances.json" doesn't exist
+    if (!ressource.exists() || ressource.isDirectory()) {
+      JSONArray poiDistances = new JSONArray();
+
+      int index = 0;
+      for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
+        for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
+
+          JSONObject point = new JSONObject();
+          point.setInt("nearestBykeParkingDistance", nearestDistance(i, j, BykeParkings));
+          point.setInt("nearestBench&Picnic_TableDistance", nearestDistance(i, j, Bench_Picnic_Tables));
+
+          poiDistances.setJSONObject(index, point);
+          index++;
+        }
+      }
+      saveJSONArray(poiDistances, "data/poi_distances.json");
+      return poiDistances;
+    }
+    
+    // If "poi_distances.json" exist
+    else {
+      return loadJSONArray("poi_distances.json");      
+    }
+  }
 }

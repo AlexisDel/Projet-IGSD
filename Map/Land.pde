@@ -82,16 +82,13 @@ public class Land {
     Poi pointsOfInterests = new Poi();
     ArrayList<Map3D.ObjectPoint> BykeParkingDistances = pointsOfInterests.getPoints("bicycle_parking.geojson");
     ArrayList<Map3D.ObjectPoint> Bench_Picnic_TableDistances = pointsOfInterests.getPoints("bench&picnic_table.geojson");
+    
+    JSONArray poiDistances = pointsOfInterests.getPoiDistances(w, h, tileSize, BykeParkingDistances, Bench_Picnic_TableDistances);
 
     //Build satellite
+    int index = 0;
     for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
       for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
-
-        // BykeParkings
-        int nearestBykeParkingDistance = pointsOfInterests.nearestDistance(i, j, BykeParkingDistances);
-
-        // Bench&Picnic_Table
-        int nearestBench_Picnic_TableDistance = pointsOfInterests.nearestDistance(i, j, Bench_Picnic_TableDistances);
 
         // Build tile
 
@@ -101,7 +98,7 @@ public class Land {
         float nwV = ( (nw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nnw = nw.toNormal();
         this.satellite.normal(nnw.x, nnw.y, nnw.z);
-        this.satellite.attrib("heat", nearestBykeParkingDistance, nearestBench_Picnic_TableDistance);
+        this.satellite.attrib("heat", poiDistances.getJSONObject(index).getInt("nearestBykeParkingDistance"), poiDistances.getJSONObject(index).getInt("nearestBench&Picnic_TableDistance"));
         this.satellite.vertex(nw.x, nw.y, nw.z, nwU, nwV);
 
         // North Est corner
@@ -127,6 +124,8 @@ public class Land {
         PVector nsw = sw.toNormal();
         this.satellite.normal(nsw.x, nsw.y, nsw.z);
         this.satellite.vertex(sw.x, sw.y, sw.z, swU, swV);
+        
+        index++;
       }
     }
 
