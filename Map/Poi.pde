@@ -59,7 +59,13 @@ public class Poi {
     }
     return pointsList;
   }
-
+  
+  /**
+   * Returns the distance between a point and it's closest neighbor in an Arraylist of points
+   * @param float x, y coordinates of the point 
+   * @param points ArrayList of Map3D.ObjectPoint points
+   * @return int nearestDistance (distance to nearest neighbor)  
+   */
   public int nearestDistance(float x, float y, ArrayList<Map3D.ObjectPoint> points) {
     int nearestDistance = (int) dist(x, y, points.get(0).x, points.get(0).y);
     for (Map3D.ObjectPoint p : points) {
@@ -69,14 +75,24 @@ public class Poi {
     }
     return nearestDistance;
   }
-
+  
+   /**
+   * Returns a JSONArray containing the Poi Distances for every point in the map
+   * If the JSONArray exists it loads it and returns it
+   * If not, it creates it, calculates and adds to it the poiDistance for each point in the map 
+   * @param float w,h width and height of the Map3D 
+   * @param BykeParkingd, Bench_picninc_Tables ArrayLists
+   * @return JSONArray poiDistances
+   */
   public JSONArray getPoiDistances(float w, float h, float tileSize, ArrayList<Map3D.ObjectPoint> BykeParkings, ArrayList<Map3D.ObjectPoint> Bench_Picnic_Tables) {
     File ressource = dataFile("poi_distances.json");
     
     // If "poi_distances.json" doesn't exist
     if (!ressource.exists() || ressource.isDirectory()) {
+      //Creates the JSONArray, initilizing it to an empty state
       JSONArray poiDistances = new JSONArray();
-
+      
+      //Calculates the nearest distance to both Poi for each point in the Map and adds it to the JSONArray
       int index = 0;
       for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
         for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
@@ -89,11 +105,12 @@ public class Poi {
           index++;
         }
       }
+      //Saves the JSONArray and returns it
       saveJSONArray(poiDistances, "data/poi_distances.json");
       return poiDistances;
     }
     
-    // If "poi_distances.json" exist
+    // If "poi_distances.json" exists
     else {
       return loadJSONArray("poi_distances.json");      
     }
