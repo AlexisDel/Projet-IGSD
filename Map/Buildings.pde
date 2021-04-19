@@ -96,7 +96,7 @@ public class Buildings {
             PVector v = floorCoordinates.get(i);
             roof.vertex(v.x, v.y, v.z+top);
           }
-          roof.endShape();         
+          roof.endShape(CLOSE);         
           buildings.addChild(roof);
           
           //Adds the walls of the building to the group Buildings

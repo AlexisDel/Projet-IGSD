@@ -11,14 +11,6 @@ PShader myShader;
 
 void setup() {
 
-  // Display setup
-  myShader = loadShader("fragmentShader.glsl", "vertexShader.glsl");
-  fullScreen(P3D);
-  smooth(8);
-  frameRate(60);
-
-  hint(ENABLE_KEY_REPEAT);  // Make camera move easier
-
   // Initial drawing
   background(0x40);
   
@@ -49,13 +41,26 @@ void setup() {
   this.buildings.add("buildings_CEA_algorithmes.geojson", 0xFF30FF30);
   this.buildings.add("buildings_Thales.geojson", 0xFFFF3030);
   this.buildings.add("buildings_Paris_Saclay.geojson", 0xFFee00dd);
+  
+  /*
+  * Config
+  */
+  hint(ENABLE_KEY_REPEAT);  // Make camera move easier
+  
+  /*
+  * Display setup
+  */
+  myShader = loadShader("fragmentShader.glsl", "vertexShader.glsl");
+  fullScreen(P3D);
+  smooth(8);
+  frameRate(60);
 }
 
 void draw() {
-  
-  //shader(myShader);
 
   this.camera.update();
+  
+  shader(myShader);
   
   //Clear
   background(0x40);
@@ -137,11 +142,11 @@ void mouseDragged() {
 
     // Camera Horizontal
     float dx = mouseX - pmouseX;
-    this.camera.adjustLongitude(dx*PI/256.0);
+    this.camera.adjustLongitude(dx*PI/512.0);
 
     // Camera Vertical
     float dy = mouseY - pmouseY;
-    this.camera.adjustColatitude(dy*PI/512.0);
+    this.camera.adjustColatitude(dy*PI/1024.0);
   }
 }
 

@@ -58,5 +58,17 @@ public class Poi {
       }
     }
     return pointsList;  
-  }    
+  }
+  
+  public int nearestDistance(float x, float y, ArrayList<Map3D.ObjectPoint> points) {
+    int nearestDistance = (int) dist(x, y, points.get(0).x, points.get(0).y);
+    for (Map3D.ObjectPoint p : points) {
+      if (dist(x, y, p.x, p.y) < nearestDistance) {
+        nearestDistance = (int)dist(x, y, p.x, p.y);
+      }
+    }
+    return nearestDistance;
+  }
+  
+  
 }

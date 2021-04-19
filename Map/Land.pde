@@ -22,6 +22,8 @@ public class Land {
     this.shadow.beginShape(QUADS);
     this.shadow.fill(0x992F2F2F);
     this.shadow.noStroke();
+    
+    this.shadow.normal(1,0,0);
     // Top left map corner
     this.shadow.vertex(-w/2.0f, -h/2.0f, 0);
     // Top right map corner
@@ -30,6 +32,7 @@ public class Land {
     this.shadow.vertex(w/2.0f, h/2.0f, 0);
     // Bottom left map corner
     this.shadow.vertex(-w/2.0f, h/2.0f, 0);
+    
     this.shadow.endShape();
 
     // Wireframe shape
@@ -41,7 +44,7 @@ public class Land {
 
     for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
       for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
-        
+
         //Build box
         Map3D.ObjectPoint nw = map.new ObjectPoint(i, j); // Top left corner
         Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSize, j); // Top right corner
@@ -66,7 +69,7 @@ public class Land {
     }
     // Load texture
     PImage uvmap = loadImage(textrueFilename);
-    
+
     this.satellite = createShape();
     this.satellite.beginShape(QUAD);
     this.satellite.noFill();
@@ -74,34 +77,33 @@ public class Land {
     this.satellite.emissive(0xD0);
     // load texture to sattelite
     this.satellite.texture(uvmap);
-    
+
     //Poi distance
     Poi pointsOfInterests = new Poi();
     ArrayList<Map3D.ObjectPoint> BykeParkingDistances = pointsOfInterests.getPoints("bicycle_parking.geojson");
-    
+    ArrayList<Map3D.ObjectPoint> Bench_Picnic_TableDistances = pointsOfInterests.getPoints("bench&picnic_table.geojson");
+
     //Build satellite
     for (float i=-w/2.0f; i<w/2.0f; i+=tileSize) {
       for (float j=-h/2.0f; j<h/2.0f; j+=tileSize) {
-        
+
         // BykeParkings
-        float nearestBykeParkingDistance = dist(i, j, BykeParkingDistances.get(0).x, BykeParkingDistances.get(0).y);
-        for (Map3D.ObjectPoint p : BykeParkingDistances){
-          if (dist(i, j, p.x, p.y) < nearestBykeParkingDistance){
-            nearestBykeParkingDistance = dist(i, j, p.x, p.y);            
-          }
-        }
-        
+        int nearestBykeParkingDistance = pointsOfInterests.nearestDistance(i, j, BykeParkingDistances);
+
+        // Bench&Picnic_Table
+        int nearestBench_Picnic_TableDistance = pointsOfInterests.nearestDistance(i, j, Bench_Picnic_TableDistances);
+
         // Build tile
-        
+
         // North West corner
         Map3D.ObjectPoint nw = map.new ObjectPoint(i, j);
         float nwU = ( (nw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
         float nwV = ( (nw.y - -h/2.0f) / (h/2.0f - -h/2.0f) ) * uvmap.height;
         PVector nnw = nw.toNormal();
         this.satellite.normal(nnw.x, nnw.y, nnw.z);
-        this.satellite.attrib("heat", nearestBykeParkingDistance);
+        this.satellite.attrib("heat", nearestBykeParkingDistance, nearestBench_Picnic_TableDistance);
         this.satellite.vertex(nw.x, nw.y, nw.z, nwU, nwV);
-        
+
         // North Est corner
         Map3D.ObjectPoint ne = map.new ObjectPoint(i+tileSize, j);
         float neU = ( (ne.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
@@ -109,7 +111,7 @@ public class Land {
         PVector nne = ne.toNormal();
         this.satellite.normal(nne.x, nne.y, nne.z);
         this.satellite.vertex(ne.x, ne.y, ne.z, neU, neV);
-        
+
         // South Est corner
         Map3D.ObjectPoint se = map.new ObjectPoint(i+tileSize, j+tileSize);
         float seU = ( (se.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
@@ -117,7 +119,7 @@ public class Land {
         PVector nse = se.toNormal();
         this.satellite.normal(nse.x, nse.y, nse.z);
         this.satellite.vertex(se.x, se.y, se.z, seU, seV);
-        
+
         // South West corner
         Map3D.ObjectPoint sw = map.new ObjectPoint(i, j+tileSize);
         float swU = ( (sw.x - -w/2.0f) / (w/2.0f - -w/2.0f) ) * uvmap.width;
@@ -125,10 +127,9 @@ public class Land {
         PVector nsw = sw.toNormal();
         this.satellite.normal(nsw.x, nsw.y, nsw.z);
         this.satellite.vertex(sw.x, sw.y, sw.z, swU, swV);
-        
       }
     }
-    
+
     this.satellite.endShape();
 
 
@@ -137,14 +138,15 @@ public class Land {
     this.wireFrame.setVisible(false);
     this.satellite.setVisible(true);
   }
-  
+
   /**
    * Update Land display
    */
   public void update() {
-    shape(this.shadow);
     shape(this.wireFrame);
     shape(this.satellite);
+    resetShader();
+    shape(this.shadow);
   }
 
   /**

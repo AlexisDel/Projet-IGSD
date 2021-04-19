@@ -96,7 +96,7 @@ public class Roads {
         case "corridor":
         case "cycleway":
         case "footway":
-        case "segment":
+        case "path":
         case "pedestrian":
         case "service":
         case "steps":
